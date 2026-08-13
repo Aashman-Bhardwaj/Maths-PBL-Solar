@@ -4,893 +4,610 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solar Smart Home — Presentation</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         :root {
-            --bg: #050510;
-            --card: rgba(255,255,255,0.04);
-            --border: rgba(255,255,255,0.08);
-            --fg: #f0f0f0;
-            --muted: rgba(255,255,255,0.5);
+            --bg: #03030a;
+            --card: rgba(255,255,255,0.035);
+            --card-hover: rgba(255,255,255,0.06);
+            --border: rgba(255,255,255,0.07);
+            --border-hl: rgba(255,179,0,0.25);
+            --fg: #eaeaea;
+            --muted: rgba(255,255,255,0.48);
+            --dim: rgba(255,255,255,0.18);
             --accent: #ffb300;
-            --accent2: #0d7377;
-            --slide-w: 960px;
-            --slide-h: 600px;
+            --accent-deep: #e69500;
+            --accent-glow: rgba(255,179,0,0.12);
+            --teal: #0d7377;
+            --green: #43a047;
+            --blue: #1e88e5;
+            --cyan: #00acc1;
+            --slide-w: 960;
+            --slide-h: 540;
+            --bar-h: 48px;
+            --bottom-h: 72px;
+            --radius: 10px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
+        html, body {
+            height: 100%; width: 100%;
+            overflow: hidden;
             background: var(--bg);
             font-family: 'Space Grotesk', sans-serif;
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
             color: var(--fg);
-            user-select: none;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* ── Starfield ── */
+        /* ── Background layers ── */
         #starfield {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            position: fixed; inset: 0;
             z-index: 0;
-        }
-
-        /* ── Top Bar ── */
-        .top-bar {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 24px;
-            background: rgba(5,5,16,0.85);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .top-bar .brand {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-            font-size: 13px;
-            letter-spacing: 2px;
-            color: var(--accent);
-        }
-
-        .top-bar .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            color: var(--muted);
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 13px;
-            padding: 6px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .top-bar .back-btn:hover {
-            color: var(--fg);
-            border-color: rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.06);
-        }
-
-        /* ── Zoom Controls ── */
-        .zoom-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .zoom-btn {
-            width: 32px; height: 32px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: var(--card);
-            color: var(--muted);
-            font-size: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.25s ease;
-            font-family: 'Space Grotesk', sans-serif;
-        }
-
-        .zoom-btn:hover {
-            color: var(--fg);
-            border-color: var(--accent);
-            background: rgba(255,179,0,0.08);
-        }
-
-        .zoom-label {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 11px;
-            color: var(--muted);
-            min-width: 48px;
-            text-align: center;
-            letter-spacing: 1px;
-        }
-
-        .zoom-base64 {
-            font-size: 9px;
-            color: rgba(255,255,255,0.2);
-            font-family: monospace;
-            max-width: 100px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        /* ── Slide Viewport ── */
-        .slide-viewport {
-            position: fixed;
-            top: 56px;
-            left: 0; right: 0; bottom: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            z-index: 10;
-        }
-
-        .slide-scaler {
-            transform-origin: center center;
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .slide-track {
-            display: flex;
-            transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-
-        /* ── Individual Slide ── */
-        .slide {
-            width: var(--slide-w);
-            height: var(--slide-h);
-            flex-shrink: 0;
-            padding: 50px 60px;
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient(160deg, rgba(10,10,30,0.95), rgba(5,5,16,0.98));
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .slide::before {
-            content: '';
-            position: absolute;
-            top: -50%; right: -30%;
-            width: 400px; height: 400px;
-            background: radial-gradient(circle, rgba(255,179,0,0.04), transparent 70%);
-            border-radius: 50%;
             pointer-events: none;
         }
 
-        .slide-number {
-            position: absolute;
-            top: 20px; right: 30px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 10px;
-            letter-spacing: 2px;
-            color: rgba(255,255,255,0.15);
+        .amb {
+            position: fixed; border-radius: 50%;
+            filter: blur(140px); opacity: 0.18;
+            z-index: 0; pointer-events: none;
+        }
+        .amb-1 { width: 600px; height: 600px; top: -15%; right: -8%; background: radial-gradient(circle, #ff8f0033, transparent 70%); }
+        .amb-2 { width: 700px; height: 700px; bottom: -20%; left: -12%; background: radial-gradient(circle, #0d3777, transparent 70%); }
+
+        /* ── Top toolbar ── */
+        .toolbar {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: var(--bar-h);
+            z-index: 200;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 16px;
+            background: rgba(3,3,10,0.82);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
         }
 
-        .slide-footer {
-            position: absolute;
-            bottom: 18px; left: 60px; right: 60px;
-            font-size: 9px;
-            letter-spacing: 2px;
-            color: rgba(255,255,255,0.15);
+        .toolbar-left, .toolbar-right { display: flex; align-items: center; gap: 8px; }
+
+        .tb-btn {
+            height: 32px; padding: 0 14px;
+            border-radius: 7px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--muted);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            cursor: pointer;
+            display: inline-flex; align-items: center; gap: 6px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .tb-btn:hover { color: var(--fg); border-color: rgba(255,255,255,0.15); background: var(--card-hover); }
+        .tb-btn:active { transform: scale(0.96); }
+        .tb-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        .tb-btn i { font-size: 12px; }
+
+        .tb-brand {
             font-family: 'Orbitron', sans-serif;
-            text-transform: uppercase;
+            font-weight: 700; font-size: 11px;
+            letter-spacing: 2px; color: var(--accent);
+            padding: 0 12px;
         }
 
-        /* ── Slide Typography ── */
-        .slide-tag {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 10px;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 16px;
+        .tb-sep {
+            width: 1px; height: 20px;
+            background: var(--border); margin: 0 4px;
         }
 
-        .slide-title {
+        .zoom-group {
+            display: flex; align-items: center; gap: 4px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2px 4px;
+        }
+
+        .z-btn {
+            width: 28px; height: 28px;
+            border-radius: 6px; border: none;
+            background: transparent;
+            color: var(--muted); font-size: 15px;
+            cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+            transition: all 0.2s ease;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .z-btn:hover { color: var(--fg); background: var(--card-hover); }
+        .z-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+        .z-label {
             font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            font-size: 32px;
-            line-height: 1.25;
-            margin-bottom: 20px;
+            font-size: 10px; color: var(--muted);
+            min-width: 42px; text-align: center;
+            letter-spacing: 0.5px;
+        }
+
+        .b64-chip {
+            font-family: 'Courier New', monospace;
+            font-size: 8px; color: var(--dim);
+            max-width: 90px; overflow: hidden;
+            text-overflow: ellipsis; white-space: nowrap;
+            cursor: pointer; padding: 3px 6px;
+            border-radius: 4px; transition: all 0.2s;
+        }
+        .b64-chip:hover { color: var(--muted); background: var(--card); }
+
+        /* ── Main viewport ── */
+        .viewport {
+            position: fixed;
+            top: var(--bar-h);
+            left: 0; right: 0;
+            bottom: var(--bottom-h);
+            z-index: 10;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+            cursor: grab;
+        }
+        .viewport.dragging { cursor: grabbing; }
+
+        /* Pan/zoom wrapper */
+        .pz-wrap {
+            transform-origin: 0 0;
+            will-change: transform;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .pz-wrap.no-transition { transition: none; }
+
+        /* Slide track */
+        .track {
+            display: flex;
+            will-change: transform;
+            transition: transform 0.55s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        /* ── Slide ── */
+        .slide {
+            width: 960px; height: 540px;
+            flex-shrink: 0;
+            position: relative; overflow: hidden;
+            background: linear-gradient(155deg, rgba(12,12,32,0.97) 0%, rgba(6,6,18,0.99) 100%);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            display: flex; flex-direction: column;
+            justify-content: center;
+            box-shadow: 0 8px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.02);
+        }
+
+        /* Slide inner glow */
+        .slide::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 70% 20%, rgba(255,179,0,0.025), transparent 60%);
+            pointer-events: none;
+        }
+
+        .sl-num {
+            position: absolute; top: 16px; right: 24px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 9px; letter-spacing: 2px; color: var(--dim);
+        }
+
+        .sl-foot {
+            position: absolute; bottom: 12px; left: 40px; right: 40px;
+            font-size: 8px; letter-spacing: 2.5px; color: rgba(255,255,255,0.1);
+            font-family: 'Orbitron', sans-serif; text-transform: uppercase;
+            text-align: center;
+        }
+
+        /* Entry animations per slide */
+        .slide .anim {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .slide.active .anim { opacity: 1; transform: translateY(0); }
+        .slide.active .anim.d1 { transition-delay: 0.08s; }
+        .slide.active .anim.d2 { transition-delay: 0.16s; }
+        .slide.active .anim.d3 { transition-delay: 0.24s; }
+        .slide.active .anim.d4 { transition-delay: 0.32s; }
+        .slide.active .anim.d5 { transition-delay: 0.40s; }
+        .slide.active .anim.d6 { transition-delay: 0.48s; }
+
+        /* ── Typography ── */
+        .sl-tag {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 9px; letter-spacing: 4px;
+            text-transform: uppercase; color: var(--accent);
+            margin-bottom: 12px;
+        }
+        .sl-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900; font-size: 26px;
+            line-height: 1.3; margin-bottom: 14px;
             color: var(--fg);
         }
+        .sl-sub {
+            font-size: 13px; color: var(--muted);
+            line-height: 1.75; max-width: 680px;
+        }
+        .sl-sub strong { color: var(--accent); font-weight: 600; }
 
-        .slide-subtitle {
-            font-size: 15px;
-            color: var(--muted);
-            line-height: 1.7;
-            max-width: 700px;
+        /* ── Title Slide ── */
+        .sl-hero {
+            align-items: center; text-align: center;
+            padding: 50px 60px;
         }
 
-        .slide-subtitle strong {
-            color: var(--accent);
-            font-weight: 600;
+        .sun-icon {
+            width: 64px; height: 64px;
+            margin-bottom: 24px; position: relative;
+            animation: sunSpin 25s linear infinite;
         }
-
-        /* ── Slide 1: Title ── */
-        .slide-title-slide {
-            align-items: center;
-            text-align: center;
+        .sun-icon .core {
+            position: absolute; top: 50%; left: 50%;
+            width: 18px; height: 18px;
+            background: var(--accent); border-radius: 50%;
+            transform: translate(-50%,-50%);
+            box-shadow: 0 0 24px var(--accent), 0 0 48px rgba(255,179,0,0.25);
         }
-
-        .slide-title-slide .solar-big {
-            width: 80px; height: 80px;
-            margin-bottom: 28px;
-            position: relative;
-            animation: iconSpin 20s linear infinite;
+        .sun-icon .ray {
+            position: absolute; top: 50%; left: 50%;
+            width: 2px; height: 28px;
+            background: linear-gradient(to top, rgba(255,179,0,0.45), transparent);
+            transform-origin: bottom center; border-radius: 2px;
         }
+        @keyframes sunSpin { to { transform: rotate(360deg); } }
 
-        .slide-title-slide .solar-big .core {
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 24px; height: 24px;
-            background: var(--accent);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 30px var(--accent), 0 0 60px rgba(255,179,0,0.3);
-        }
-
-        .slide-title-slide .solar-big .ray {
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 2px; height: 34px;
-            background: linear-gradient(to top, rgba(255,179,0,0.5), transparent);
-            transform-origin: bottom center;
-            border-radius: 2px;
-        }
-
-        .slide-title-slide .main-title {
+        .hero-title {
             font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            font-size: 42px;
+            font-weight: 900; font-size: 38px;
             letter-spacing: 3px;
-            background: linear-gradient(135deg, #fff, var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            background: linear-gradient(135deg, #fff 20%, var(--accent) 80%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 8px;
+            animation: shimmer 5s ease-in-out infinite alternate;
+            margin-bottom: 6px;
         }
+        @keyframes shimmer { 0%{background-position:0% 50%} 100%{background-position:100% 50%} }
 
-        .slide-title-slide .sub-line {
+        .hero-sub {
             font-family: 'Orbitron', sans-serif;
-            font-size: 13px;
-            color: var(--accent);
-            letter-spacing: 4px;
-            margin-bottom: 30px;
+            font-size: 12px; color: var(--accent);
+            letter-spacing: 3px; margin-bottom: 28px;
+            opacity: 0.8;
         }
 
-        .slide-title-slide .team-line {
-            font-size: 13px;
-            color: var(--muted);
-            line-height: 1.8;
+        .hero-team {
+            font-size: 13px; color: var(--muted); line-height: 1.9;
         }
+        .hero-team .leader { color: var(--accent); font-weight: 600; }
 
-        .slide-title-slide .team-line .leader {
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        .slide-title-slide .math-tag {
+        .hero-meta {
             margin-top: 20px;
             font-family: 'Orbitron', sans-serif;
-            font-size: 9px;
-            letter-spacing: 5px;
-            color: rgba(255,255,255,0.2);
-            text-transform: uppercase;
+            font-size: 8px; letter-spacing: 5px;
+            color: rgba(255,255,255,0.15); text-transform: uppercase;
         }
 
-        /* ── Problem Cards ── */
-        .problem-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-top: 24px;
-        }
+        /* ── Cards grid helpers ── */
+        .g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 18px; }
+        .g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 18px; }
+        .g2x2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 18px; }
 
-        .problem-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 24px 20px;
-            text-align: center;
-            transition: all 0.3s ease;
+        .card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 18px 16px;
+            text-align: center; transition: all 0.25s ease;
         }
+        .card:hover { border-color: var(--border-hl); background: var(--accent-glow); }
 
-        .problem-card:hover {
-            border-color: rgba(255,179,0,0.2);
-            background: rgba(255,179,0,0.04);
+        .card .ic {
+            font-size: 22px; margin-bottom: 10px; color: var(--accent);
         }
-
-        .problem-card .icon {
-            font-size: 28px;
-            margin-bottom: 14px;
-            color: var(--accent);
-        }
-
-        .problem-card h3 {
+        .card h4 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 13px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            letter-spacing: 1px;
+            font-size: 11px; font-weight: 700;
+            letter-spacing: 0.5px; margin-bottom: 6px;
+        }
+        .card p { font-size: 11px; color: var(--muted); line-height: 1.55; }
+
+        /* Step card with number badge */
+        .step-card { position: relative; padding-top: 26px; }
+        .step-badge {
+            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+            width: 24px; height: 24px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+            color: #0a0a0a; font-family: 'Orbitron', sans-serif;
+            font-weight: 900; font-size: 11px;
+            display: flex; align-items: center; justify-content: center;
         }
 
-        .problem-card p {
-            font-size: 12px;
-            color: var(--muted);
+        /* Output card (horizontal) */
+        .out-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 18px;
+            display: flex; gap: 14px; align-items: flex-start;
+            transition: all 0.25s ease;
+        }
+        .out-card:hover { border-color: var(--border-hl); }
+        .out-icon {
+            width: 40px; height: 40px; border-radius: 9px;
+            background: var(--accent-glow);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; color: var(--accent); flex-shrink: 0;
+        }
+        .out-card h4 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px; font-weight: 700;
+            letter-spacing: 0.3px; margin-bottom: 4px;
+        }
+        .out-card p { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+        /* Subject card with colored icon */
+        .subj-card .sic {
+            width: 42px; height: 42px; border-radius: 10px;
+            margin: 0 auto 12px; display: flex;
+            align-items: center; justify-content: center; font-size: 18px;
+        }
+        .subj-card:nth-child(1) .sic { background: rgba(255,179,0,0.1); color: var(--accent); }
+        .subj-card:nth-child(2) .sic { background: rgba(67,160,71,0.1); color: var(--green); }
+        .subj-card:nth-child(3) .sic { background: rgba(30,136,229,0.1); color: var(--blue); }
+        .subj-card:nth-child(4) .sic { background: rgba(0,172,193,0.1); color: var(--cyan); }
+
+        /* Formula box */
+        .formula-box {
+            background: rgba(255,179,0,0.03);
+            border: 1px solid rgba(255,179,0,0.12);
+            border-radius: 12px; padding: 22px 28px;
+            margin: 16px 0; text-align: center;
+        }
+        .formula-expr {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 19px; font-weight: 700; color: var(--fg);
+            letter-spacing: 0.5px;
+        }
+        .formula-expr .frac {
+            display: inline-flex; flex-direction: column;
+            align-items: center; vertical-align: middle; margin: 0 6px;
+        }
+        .formula-expr .frac .num {
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 4px; margin-bottom: 4px;
+        }
+        .formula-expr .frac .den { padding-top: 2px; }
+        .formula-note { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+        /* Variable grid */
+        .var-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+        .var-item {
+            display: flex; gap: 10px; align-items: flex-start;
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 8px; padding: 12px 14px;
+        }
+        .var-ltr {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900; font-size: 20px; color: var(--accent);
+            flex-shrink: 0; width: 28px; text-align: center;
+        }
+        .var-item p { font-size: 11px; color: var(--muted); line-height: 1.45; }
+        .var-item p strong { color: var(--fg); font-weight: 600; display: block; margin-bottom: 1px; }
+
+        /* Flow row */
+        .flow-row {
+            display: flex; align-items: center; justify-content: center;
+            gap: 0; margin-top: 22px;
+        }
+        .flow-node {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 18px 18px;
+            text-align: center; min-width: 145px;
+            transition: all 0.25s ease;
+        }
+        .flow-node:hover { border-color: var(--border-hl); }
+        .flow-node .fi { font-size: 20px; margin-bottom: 8px; color: var(--accent); }
+        .flow-node h4 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px; font-weight: 700;
+            letter-spacing: 0.5px; margin-bottom: 4px;
+        }
+        .flow-node p { font-size: 9.5px; color: var(--muted); line-height: 1.5; }
+        .flow-arr { color: var(--dim); font-size: 16px; margin: 0 6px; flex-shrink: 0; }
+
+        /* Team cards */
+        .team-card {
+            text-align: center; padding: 20px 14px;
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: var(--radius); transition: all 0.25s ease;
+        }
+        .team-card:hover { border-color: var(--border-hl); }
+        .team-card.lead {
+            border-color: rgba(255,179,0,0.22);
+            background: rgba(255,179,0,0.035);
+        }
+        .avatar {
+            width: 48px; height: 48px; border-radius: 50%;
+            margin: 0 auto 12px; display: flex;
+            align-items: center; justify-content: center;
+            font-size: 17px; font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .lead .avatar {
+            background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+            color: #0a0a0a;
+            box-shadow: 0 0 18px rgba(255,179,0,0.25);
+        }
+        .team-card:not(.lead) .avatar {
+            background: rgba(255,255,255,0.05);
+            color: var(--muted); border: 1px solid var(--border);
+        }
+        .team-card h4 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px; font-weight: 700;
+            letter-spacing: 0.3px; margin-bottom: 3px;
+        }
+        .lead h4 { color: var(--accent); }
+        .team-card .role {
+            font-size: 9px; color: var(--muted);
+            letter-spacing: 1.5px; text-transform: uppercase;
+        }
+
+        /* Thank you */
+        .sl-thanks { align-items: center; text-align: center; padding: 50px 60px; }
+        .thanks-quote {
+            font-size: 16px; font-weight: 300; color: var(--muted);
+            line-height: 1.8; max-width: 560px; margin: 0 auto;
+            font-style: italic;
+        }
+        .thanks-quote strong { color: var(--fg); font-weight: 600; font-style: normal; }
+        .thanks-big {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 34px; font-weight: 900; letter-spacing: 5px;
+            background: linear-gradient(135deg, #fff, var(--accent));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; margin: 22px 0 14px;
+        }
+        .thanks-credits { font-size: 11px; color: var(--dim); letter-spacing: 0.5px; }
+
+        /* Callout box */
+        .callout {
+            margin-top: 16px; padding: 14px 18px;
+            background: rgba(255,179,0,0.03);
+            border: 1px solid rgba(255,179,0,0.1);
+            border-radius: 9px; text-align: center;
+            font-size: 12px; color: var(--accent); font-weight: 500;
             line-height: 1.6;
         }
 
-        /* ── Flow Diagram ── */
-        .flow-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0;
-            margin-top: 30px;
-        }
-
-        .flow-step {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px 22px;
-            text-align: center;
-            min-width: 160px;
-            transition: all 0.3s ease;
-        }
-
-        .flow-step:hover {
-            border-color: rgba(255,179,0,0.25);
-        }
-
-        .flow-step .f-icon {
-            font-size: 22px;
-            margin-bottom: 10px;
-            color: var(--accent);
-        }
-
-        .flow-step h4 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            margin-bottom: 6px;
-        }
-
-        .flow-step p {
-            font-size: 10px;
-            color: var(--muted);
-            line-height: 1.5;
-        }
-
-        .flow-arrow {
-            color: rgba(255,255,255,0.15);
-            font-size: 20px;
-            margin: 0 8px;
-            flex-shrink: 0;
-        }
-
-        /* ── Steps Grid ── */
-        .steps-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-top: 28px;
-        }
-
-        .step-card {
-            position: relative;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 24px 16px;
-            text-align: center;
-        }
-
-        .step-card .step-num {
-            position: absolute;
-            top: -12px; left: 50%;
-            transform: translateX(-50%);
-            width: 28px; height: 28px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent), #ff8f00);
-            color: #0a0a0a;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .step-card .s-icon {
-            font-size: 24px;
-            margin-bottom: 12px;
-            color: var(--accent);
-            margin-top: 8px;
-        }
-
-        .step-card h4 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .step-card p {
-            font-size: 11px;
-            color: var(--muted);
-            line-height: 1.55;
-        }
-
-        /* ── Formula ── */
-        .formula-box {
-            background: rgba(255,179,0,0.04);
-            border: 1px solid rgba(255,179,0,0.15);
-            border-radius: 14px;
-            padding: 28px 32px;
-            margin: 24px 0;
-            text-align: center;
-        }
-
-        .formula-main {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--fg);
-            letter-spacing: 1px;
-            margin-bottom: 6px;
-        }
-
-        .formula-main .frac {
-            display: inline-flex;
-            flex-direction: column;
-            align-items: center;
-            vertical-align: middle;
-            margin: 0 8px;
-        }
-
-        .formula-main .frac .num {
-            border-bottom: 2px solid var(--accent);
-            padding-bottom: 4px;
-            margin-bottom: 4px;
-        }
-
-        .formula-main .frac .den {
-            padding-top: 2px;
-        }
-
-        .formula-note {
-            font-size: 12px;
-            color: var(--muted);
-            margin-top: 4px;
-        }
-
-        .var-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-top: 20px;
-        }
-
-        .var-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 14px 16px;
-        }
-
-        .var-letter {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            font-size: 22px;
-            color: var(--accent);
-            flex-shrink: 0;
-            width: 32px;
-            text-align: center;
-        }
-
-        .var-item p {
-            font-size: 12px;
-            color: var(--muted);
-            line-height: 1.5;
-        }
-
-        .var-item p strong {
-            color: var(--fg);
-            font-weight: 600;
-            display: block;
-            margin-bottom: 2px;
-        }
-
-        /* ── Output Cards ── */
-        .output-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 18px;
-            margin-top: 24px;
-        }
-
-        .output-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 24px;
-            display: flex;
-            gap: 16px;
-            align-items: flex-start;
-            transition: all 0.3s ease;
-        }
-
-        .output-card:hover {
-            border-color: rgba(255,179,0,0.2);
-        }
-
-        .output-card .o-icon {
-            width: 44px; height: 44px;
-            border-radius: 10px;
-            background: rgba(255,179,0,0.08);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            color: var(--accent);
-            flex-shrink: 0;
-        }
-
-        .output-card h4 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 6px;
-        }
-
-        .output-card p {
-            font-size: 12px;
-            color: var(--muted);
-            line-height: 1.55;
-        }
-
-        /* ── Subject Cards ── */
-        .subject-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-top: 24px;
-        }
-
-        .subject-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 22px 16px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .subject-card:hover {
-            border-color: rgba(255,179,0,0.2);
-            transform: translateY(-2px);
-        }
-
-        .subject-card .s-icon {
-            width: 48px; height: 48px;
-            border-radius: 12px;
-            margin: 0 auto 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-        }
-
-        .subject-card:nth-child(1) .s-icon { background: rgba(255,179,0,0.1); color: var(--accent); }
-        .subject-card:nth-child(2) .s-icon { background: rgba(76,175,80,0.1); color: #4caf50; }
-        .subject-card:nth-child(3) .s-icon { background: rgba(33,150,243,0.1); color: #2196f3; }
-        .subject-card:nth-child(4) .s-icon { background: rgba(0,188,212,0.1); color: #00bcd4; }
-
-        .subject-card h4 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .subject-card p {
-            font-size: 11px;
-            color: var(--muted);
-            line-height: 1.55;
-        }
-
-        /* ── Team Grid ── */
-        .team-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-top: 28px;
-        }
-
-        .team-card {
-            text-align: center;
-            padding: 24px 16px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            transition: all 0.3s ease;
-        }
-
-        .team-card:hover {
-            border-color: rgba(255,179,0,0.2);
-        }
-
-        .team-card.leader-card {
-            border-color: rgba(255,179,0,0.25);
-            background: rgba(255,179,0,0.04);
-        }
-
-        .team-avatar {
-            width: 56px; height: 56px;
-            border-radius: 50%;
-            margin: 0 auto 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            font-weight: 700;
-            font-family: 'Orbitron', sans-serif;
-        }
-
-        .leader-card .team-avatar {
-            background: linear-gradient(135deg, var(--accent), #ff8f00);
-            color: #0a0a0a;
-            box-shadow: 0 0 20px rgba(255,179,0,0.3);
-        }
-
-        .team-card:not(.leader-card) .team-avatar {
-            background: rgba(255,255,255,0.06);
-            color: var(--muted);
-            border: 1px solid var(--border);
-        }
-
-        .team-card h4 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
-        }
-
-        .leader-card h4 { color: var(--accent); }
-
-        .team-card .role {
-            font-size: 10px;
-            color: var(--muted);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        /* ── Thank You Slide ── */
-        .thankyou-slide {
-            align-items: center;
-            text-align: center;
-        }
-
-        .thankyou-slide .quote {
-            font-size: 18px;
-            font-weight: 300;
-            color: var(--muted);
-            line-height: 1.7;
-            max-width: 600px;
-            margin: 0 auto 10px;
-            font-style: italic;
-        }
-
-        .thankyou-slide .quote strong {
-            color: var(--fg);
-            font-weight: 600;
-            font-style: normal;
-        }
-
-        .thankyou-slide .thanks-label {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 36px;
-            font-weight: 900;
-            background: linear-gradient(135deg, #fff, var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin: 24px 0 16px;
-            letter-spacing: 4px;
-        }
-
-        .thankyou-slide .credits {
-            font-size: 12px;
-            color: rgba(255,255,255,0.3);
-            letter-spacing: 1px;
-        }
-
-        /* ── Bottom Bar ── */
-        .bottom-bar {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 24px;
-            background: rgba(5,5,16,0.9);
-            backdrop-filter: blur(12px);
+        /* ── Bottom bar ── */
+        .bottombar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            height: var(--bottom-h); z-index: 200;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 16px;
+            background: rgba(3,3,10,0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border-top: 1px solid var(--border);
         }
 
         .nav-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--card);
+            height: 36px; padding: 0 18px;
+            border-radius: 8px;
             border: 1px solid var(--border);
-            color: var(--muted);
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 13px;
-            padding: 8px 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            background: var(--card);
+            color: var(--muted); font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 6px;
+            transition: all 0.2s ease;
         }
+        .nav-btn:hover:not(:disabled) { color: var(--fg); border-color: rgba(255,255,255,0.18); background: var(--card-hover); }
+        .nav-btn:active:not(:disabled) { transform: scale(0.96); }
+        .nav-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+        .nav-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-        .nav-btn:hover:not(:disabled) {
-            color: var(--fg);
-            border-color: rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.06);
+        .center-nav { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; }
+
+        .dots { display: flex; gap: 5px; align-items: center; }
+        .dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: rgba(255,255,255,0.1); border: none;
+            padding: 0; cursor: pointer; transition: all 0.3s ease;
         }
-
-        .nav-btn:disabled {
-            opacity: 0.25;
-            cursor: not-allowed;
+        .dot.on {
+            background: var(--accent); width: 22px;
+            border-radius: 4px; box-shadow: 0 0 10px rgba(255,179,0,0.35);
         }
+        .dot:hover:not(.on) { background: rgba(255,255,255,0.25); }
+        .dot:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-        .nav-btn:focus-visible {
-            outline: 2px solid var(--accent);
-            outline-offset: 2px;
-        }
-
-        /* Progress bar */
-        .progress-wrap {
-            flex: 1;
-            max-width: 400px;
-            margin: 0 24px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 3px;
-            background: rgba(255,255,255,0.06);
-            border-radius: 3px;
+        .prog-bar {
+            width: 280px; max-width: 50vw; height: 2px;
+            background: rgba(255,255,255,0.05); border-radius: 2px;
             overflow: hidden;
         }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent), #ff8f00);
-            border-radius: 3px;
-            transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        .prog-fill {
+            height: 100%; border-radius: 2px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-deep));
+            transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        .progress-text {
+        .prog-label {
             font-family: 'Orbitron', sans-serif;
-            font-size: 10px;
-            color: rgba(255,255,255,0.25);
-            letter-spacing: 2px;
+            font-size: 9px; color: var(--dim); letter-spacing: 2px;
         }
 
-        .slide-dots {
-            display: flex;
-            gap: 6px;
-            align-items: center;
+        /* ── Minimap ── */
+        .minimap {
+            position: fixed; right: 14px;
+            top: calc(var(--bar-h) + 14px);
+            z-index: 150; display: flex; flex-direction: column;
+            gap: 4px; opacity: 0.5; transition: opacity 0.3s;
         }
+        .minimap:hover { opacity: 1; }
 
-        .slide-dot {
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.12);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: none;
-            padding: 0;
+        .mm-slide {
+            width: 52px; height: 29px;
+            border-radius: 3px; border: 1px solid var(--border);
+            background: var(--card); cursor: pointer;
+            transition: all 0.2s ease; position: relative; overflow: hidden;
         }
-
-        .slide-dot.active {
-            background: var(--accent);
-            width: 20px;
-            border-radius: 4px;
-            box-shadow: 0 0 8px rgba(255,179,0,0.4);
+        .mm-slide::after {
+            content: attr(data-n);
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 7px; color: var(--dim); letter-spacing: 1px;
         }
-
-        .slide-dot:hover:not(.active) {
-            background: rgba(255,255,255,0.3);
+        .mm-slide.on {
+            border-color: var(--accent);
+            background: var(--accent-glow);
+            box-shadow: 0 0 8px rgba(255,179,0,0.15);
         }
+        .mm-slide.on::after { color: var(--accent); }
+        .mm-slide:hover:not(.on) { border-color: rgba(255,255,255,0.15); }
 
-        .slide-dot:focus-visible {
-            outline: 2px solid var(--accent);
-            outline-offset: 2px;
-        }
-
-        /* ── Keyboard hint ── */
-        .key-hint {
-            position: fixed;
-            bottom: 74px;
-            right: 24px;
-            font-size: 10px;
-            color: rgba(255,255,255,0.12);
-            letter-spacing: 1px;
-            z-index: 50;
+        /* ── Key hints ── */
+        .hints {
+            position: fixed; bottom: calc(var(--bottom-h) + 8px);
+            left: 50%; transform: translateX(-50%);
+            font-size: 9px; color: rgba(255,255,255,0.08);
+            letter-spacing: 0.5px; z-index: 50;
             font-family: 'Space Grotesk', sans-serif;
         }
-
-        .key-hint kbd {
-            display: inline-block;
-            padding: 2px 6px;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 4px;
-            font-family: inherit;
-            margin: 0 2px;
+        .hints kbd {
+            display: inline-block; padding: 1px 5px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 3px; font-family: inherit; margin: 0 1px;
         }
+
+        /* ── Fullscreen adjustments ── */
+        body.fs-mode .toolbar,
+        body.fs-mode .bottombar,
+        body.fs-mode .minimap,
+        body.fs-mode .hints { opacity: 0; pointer-events: none; transition: opacity 0.4s; }
+        body.fs-mode:hover .toolbar,
+        body.fs-mode:hover .bottombar,
+        body.fs-mode:hover .minimap { opacity: 1; pointer-events: auto; }
+        body.fs-mode .viewport { top: 0; bottom: 0; }
 
         /* ── Responsive ── */
-        @media (max-width: 1000px) {
-            :root { --slide-w: 90vw; --slide-h: 56vw; }
-            .slide { padding: 30px 32px; }
-            .slide-title { font-size: 22px; }
-            .problem-grid, .subject-grid, .steps-grid, .team-grid { grid-template-columns: repeat(2, 1fr); }
-            .flow-row { flex-wrap: wrap; }
-            .flow-arrow { display: none; }
-            .output-grid { grid-template-columns: 1fr; }
-            .var-grid { grid-template-columns: 1fr; }
-            .slide-title-slide .main-title { font-size: 28px; }
-            .formula-main { font-size: 16px; }
-            .thankyou-slide .thanks-label { font-size: 26px; }
+        @media (max-width: 1024px) {
+            .minimap { display: none; }
+            .b64-chip { display: none; }
         }
 
-        @media (max-width: 600px) {
-            :root { --slide-w: 96vw; --slide-h: 65vw; }
-            .slide { padding: 24px 20px; }
-            .problem-grid, .subject-grid, .steps-grid, .team-grid { grid-template-columns: 1fr; }
-            .top-bar { padding: 10px 14px; }
-            .top-bar .brand { font-size: 10px; }
-            .zoom-base64 { display: none; }
-            .bottom-bar { padding: 10px 14px; }
-            .key-hint { display: none; }
+        @media (max-width: 700px) {
+            :root { --bar-h: 44px; --bottom-h: 64px; }
+            .tb-brand { font-size: 9px; letter-spacing: 1px; padding: 0 6px; }
+            .tb-btn { padding: 0 8px; font-size: 11px; height: 28px; }
+            .tb-btn .btn-text { display: none; }
+            .hints { display: none; }
+            .nav-btn { padding: 0 12px; font-size: 11px; height: 32px; }
+            .nav-btn .btn-text { display: none; }
+            .prog-bar { width: 140px; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -904,554 +621,679 @@
 </head>
 <body>
 
-    <canvas id="starfield" aria-hidden="true"></canvas>
+<canvas id="starfield" aria-hidden="true"></canvas>
+<div class="amb amb-1" aria-hidden="true"></div>
+<div class="amb amb-2" aria-hidden="true"></div>
 
-    <!-- ── Top Bar ── -->
-    <header class="top-bar" role="banner">
-        <a href="index.html" class="back-btn" aria-label="Back to home">
-            <i class="fas fa-arrow-left"></i> Back
+<!-- ── Toolbar ── -->
+<header class="toolbar" role="banner">
+    <div class="toolbar-left">
+        <a href="index.html" class="tb-btn" aria-label="Back to home">
+            <i class="fas fa-arrow-left"></i> <span class="btn-text">Back</span>
         </a>
-        <span class="brand">SOLAR SMART HOME</span>
-        <div class="zoom-controls">
-            <span class="zoom-base64" id="b64display" aria-hidden="true"></span>
-            <button class="zoom-btn" id="zoomOut" aria-label="Zoom out">−</button>
-            <span class="zoom-label" id="zoomLabel">100%</span>
-            <button class="zoom-btn" id="zoomIn" aria-label="Zoom in">+</button>
-            <button class="zoom-btn" id="zoomReset" aria-label="Reset zoom" title="Reset">
-                <i class="fas fa-compress" style="font-size:12px"></i>
-            </button>
+        <div class="tb-sep"></div>
+        <span class="tb-brand">SOLAR SMART HOME</span>
+    </div>
+    <div class="toolbar-right">
+        <span class="b64-chip" id="b64chip" title="Click to copy Base64 state" tabindex="0" role="button" aria-label="Copy Base64 state"></span>
+        <div class="tb-sep"></div>
+        <div class="zoom-group">
+            <button class="z-btn" id="zOut" aria-label="Zoom out">&minus;</button>
+            <span class="z-label" id="zLabel">100%</span>
+            <button class="z-btn" id="zIn" aria-label="Zoom in">+</button>
+            <button class="z-btn" id="zReset" aria-label="Reset zoom" title="Reset zoom"><i class="fas fa-compress" style="font-size:10px"></i></button>
         </div>
-    </header>
+        <div class="tb-sep"></div>
+        <button class="tb-btn" id="fsBtn" aria-label="Toggle fullscreen">
+            <i class="fas fa-expand"></i> <span class="btn-text">Present</span>
+        </button>
+    </div>
+</header>
 
-    <!-- ── Slide Viewport ── -->
-    <div class="slide-viewport" id="slideViewport">
-        <div class="slide-scaler" id="slideScaler">
-            <div class="slide-track" id="slideTrack">
+<!-- ── Minimap ── -->
+<aside class="minimap" id="minimap" aria-label="Slide overview"></aside>
 
-                <!-- SLIDE 1: Title -->
-                <section class="slide slide-title-slide" aria-label="Slide 1 of 10">
-                    <span class="slide-number">01 / 10</span>
-                    <div class="solar-big" aria-hidden="true"><div class="core"></div></div>
-                    <div class="main-title">SOLAR SMART HOME</div>
-                    <div class="sub-line">Calculating the Right Energy Solution</div>
-                    <div class="team-line">
-                        Presented by <strong>THE CORE FOUR</strong><br>
-                        <span class="leader">Aashman Bhardwaj</span> (Leader) &bull;
-                        Prayag Bachani &bull;
-                        Maanya Singh Parihar &bull;
-                        Erra Sen
-                    </div>
-                    <div class="math-tag">Mathematics &bull; Project-Based Learning</div>
-                    <div class="slide-footer">THE CORE FOUR &bull; SOLAR SMART HOME</div>
-                </section>
+<!-- ── Viewport ── -->
+<div class="viewport" id="viewport">
+    <div class="pz-wrap" id="pzWrap">
+        <div class="track" id="track">
 
-                <!-- SLIDE 2: The Problem -->
-                <section class="slide" aria-label="Slide 2 of 10">
-                    <span class="slide-number">02 / 10</span>
-                    <div class="slide-tag">The Problem</div>
-                    <div class="slide-title">Why This Project Matters</div>
-                    <div class="slide-subtitle">
-                        How can <strong>algebra</strong> help families choose the right number of solar panels and reduce electricity costs?
-                    </div>
-                    <div class="problem-grid">
-                        <div class="problem-card">
-                            <div class="icon"><i class="fas fa-chart-line"></i></div>
-                            <h3>Rising Bills</h3>
-                            <p>Electricity costs keep climbing, but most households guess at solar sizing instead of calculating it.</p>
-                        </div>
-                        <div class="problem-card">
-                            <div class="icon"><i class="fas fa-question-circle"></i></div>
-                            <h3>No Simple Tool</h3>
-                            <p>Families rarely have an easy way to match their real energy use to the right panel count.</p>
-                        </div>
-                        <div class="problem-card">
-                            <div class="icon"><i class="fas fa-coins"></i></div>
-                            <h3>Missed Savings</h3>
-                            <p>Wrong-sized systems waste money — either overspending on panels or under-covering usage.</p>
-                        </div>
-                    </div>
-                    <div class="slide-footer">THE CORE FOUR &bull; SOLAR SMART HOME</div>
-                </section>
+            <!-- 1 ─ Title -->
+            <section class="slide sl-hero active" aria-label="Slide 1">
+                <span class="sl-num">01 / 10</span>
+                <div class="sun-icon anim" aria-hidden="true"><div class="core"></div></div>
+                <div class="hero-title anim d1">SOLAR SMART HOME</div>
+                <div class="hero-sub anim d2">Calculating the Right Energy Solution</div>
+                <div class="hero-team anim d3">
+                    Presented by <strong>THE CORE FOUR</strong><br>
+                    <span class="leader">Aashman Bhardwaj</span> (Leader) &bull; Prayag Bachani &bull; Maanya Singh Parihar &bull; Erra Sen
+                </div>
+                <div class="hero-meta anim d4">Mathematics &bull; Project-Based Learning</div>
+                <div class="sl-foot">THE CORE FOUR &bull; SOLAR SMART HOME</div>
+            </section>
 
-                <!-- SLIDE 3: About the Project -->
-                <section class="slide" aria-label="Slide 3 of 10">
-                    <span class="slide-number">03 / 10</span>
-                    <div class="slide-tag">About the Project</div>
-                    <div class="slide-title">Turning Algebra Into Action</div>
-                    <div class="slide-subtitle">
-                        Solar Smart Home demonstrates how algebra helps households make informed decisions about solar energy. Users enter their daily electricity consumption or appliance usage, and the system calculates the number of solar panels required, the estimated electricity cost, the annual savings, and the environmental benefits — turning a confusing decision into a simple, <strong>data-backed one</strong>.
+            <!-- 2 ─ Problem -->
+            <section class="slide" style="padding:44px 50px;" aria-label="Slide 2">
+                <span class="sl-num">02 / 10</span>
+                <div class="sl-tag anim">The Problem</div>
+                <div class="sl-title anim d1">Why This Project Matters</div>
+                <div class="sl-sub anim d2">How can <strong>algebra</strong> help families choose the right number of solar panels and reduce electricity costs?</div>
+                <div class="g3 anim d3">
+                    <div class="card">
+                        <div class="ic"><i class="fas fa-chart-line"></i></div>
+                        <h4>Rising Bills</h4>
+                        <p>Electricity costs keep climbing, but most households guess at solar sizing instead of calculating it.</p>
                     </div>
-                    <div style="margin-top:20px; padding:16px 20px; background:rgba(255,179,0,0.04); border:1px solid rgba(255,179,0,0.12); border-radius:10px; text-align:center;">
-                        <span style="font-size:13px; color:var(--accent); font-weight:600;">
-                            Enter your usage &rarr; Get the exact number of panels, the cost, the savings, and the planet's benefit &mdash; instantly.
+                    <div class="card">
+                        <div class="ic"><i class="fas fa-question-circle"></i></div>
+                        <h4>No Simple Tool</h4>
+                        <p>Families rarely have an easy way to match their real energy use to the right panel count.</p>
+                    </div>
+                    <div class="card">
+                        <div class="ic"><i class="fas fa-coins"></i></div>
+                        <h4>Missed Savings</h4>
+                        <p>Wrong-sized systems waste money — overspending on panels or under-covering usage.</p>
+                    </div>
+                </div>
+                <div class="sl-foot">THE CORE FOUR &bull; SOLAR SMART HOME</div>
+            </section>
+
+            <!-- 3 ─ About -->
+            <section class="slide" style="padding:44px 50px;" aria-label="Slide 3">
+                <span class="sl-num">03 / 10</span>
+                <div class="sl-tag anim">About the Project</div>
+                <div class="sl-title anim d1">Turning Algebra Into Action</div>
+                <div class="sl-sub anim d2">
+                    Solar Smart Home demonstrates how algebra helps households make informed decisions about solar energy. Users enter their daily electricity consumption or appliance usage, and the system calculates the number of solar panels required, the estimated electricity cost, the annual savings, and the environmental benefits — turning a confusing decision into a simple, <strong>data-backed one</strong>.
+                </div>
+                <div class="callout anim d3">
+                    Enter your usage &rarr; Get the exact number of panels, the cost, the savings, and the planet's benefit &mdash; instantly.
+                </div>
+                <div class="sl-foot">THE CORE FOUR &bull; SOLAR SMART HOME</div>
+            </section>
+
+            <!-- 4 ─ Flow -->
+            <section class="slide" style="padding:44px 50px;" aria-label="Slide 4">
+                <span class="sl-num">04 / 10</span>
+                <div class="sl-tag anim">How the Idea Flows</div>
+                <div class="sl-title anim d1">From Input to Impact</div>
+                <div class="flow-row anim d2">
+                    <div class="flow-node">
+                        <div class="fi"><i class="fas fa-bolt"></i></div>
+                        <h4>Daily Usage Input</h4>
+                        <p>kWh or appliance list</p>
+                    </div>
+                    <div class="flow-arr"><i class="fas fa-chevron-right"></i></div>
+                    <div class="flow-node">
+                        <div class="fi"><i class="fas fa-calculator"></i></div>
+                        <h4>Algebra Engine</h4>
+                        <p>Solves for panels needed</p>
+                    </div>
+                    <div class="flow-arr"><i class="fas fa-chevron-right"></i></div>
+                    <div class="flow-node">
+                        <div class="fi"><i class="fas fa-indian-rupee-sign"></i></div>
+                        <h4>Cost & Savings</h4>
+                        <p>Electricity cost + annual savings</p>
+                    </div>
+                    <div class="flow-arr"><i class="fas fa-chevron-right"></i></div>
+                    <div class="flow-node">
+                        <div class="fi"><i class="fas fa-leaf"></i></div>
+                        <h4>Environmental Impact</h4>
+                        <p>CO&#8322; reduction estimate</p>
+                    </div>
+                </div>
+                <div class="sl-foot">THE CORE FOUR &bull; SOLAR SMART HOME</div>
+            </section>
+
+            <!-- 5 ─ How It Works -->
+            <section class="slide" style="padding:44px 50px;" aria-label="Slide 5">
+                <span class="sl-num">05 / 10</span>
+                <div class="sl-tag anim">How It Works</div>
+                <div class="sl-title anim d1">From Daily Usage to Real Savings</div>
+                <div class="g4 anim d2">
+                    <div class="card step-card">
+                        <div class="step-badge">1</div>
+                        <div class="ic" style="margin-top:4px"><i class="fas fa-keyboard"></i></div>
+                        <h4>Enter Your Usage</h4>
+                        <p>Input daily electricity consumption (kWh) or appliance list with usage hours.</p>
+                    </div>
+                    <div class="card step-card">
+                        <div class="step-badge">2</div>
+                        <div class="ic" style="margin-top:4px"><i class="fas fa-square-root-variable"></i></div>
+                        <h4>Algebra Calculates</h4>
+                        <p>Formula divides total energy need by each panel's output for exact panel count.</p>
+                    </div>
+                    <div class="card step-card">
+                        <div class="step-badge">3</div>
+                        <div class="ic" style="margin-top:4px"><i class="fas fa-piggy-bank"></i></div>
+                        <h4>Cost & Savings</h4>
+                        <p>Estimates current electricity cost and projects annual solar savings.</p>
+                    </div>
+                    <div class="card step-card">
+                        <div class="step-badge">4</div>
+                        <div class="ic" style="margin-top:4px"><i class="fas fa-earth-americas"></i></div>
+                        <h4>Eco Impact</h4>
+                        <p>Calculates CO&#8322; emission reduction — real-world environmental benefit.</p>
+                    </div>
+                </div>
+                <div class="sl-foot">THE CORE FOUR &bull; SOLAR SMART HOME</div>
+            </section>
+
+            <!-- 6 ─ Math -->
+            <section class="slide" style="padding:38px 50px;" aria-label="Slide 6">
+                <span class="sl-num">06 / 10</span>
+                <div class="sl-tag anim">The Math Behind It</div>
+                <div class="sl-title anim d1" style="font-size:22px;">The Algebra That Powers the System</div>
+                <div class="formula-box anim d2">
+                    <div class="formula-expr">
+                        N =
+                        <span class="frac">
+                            <span class="num">E &nbsp;(Daily Energy in kWh)</span>
+                            <span class="den">P (Panel Output in kW) &times; S (Sunlight Hours)</span>
                         </span>
                     </div>
-                    <div class="slide-footer">THE CORE FOUR &bull; SOLAR SMART HOME</div>
-                </section>
+                    <div class="formula-note">Rounded up to the next whole panel</div>
+                </div>
+                <div class="var-grid anim d3">
+                    <div class="var-item">
+                        <div class="var-ltr">E</div>
+                        <p><strong>Daily Energy Consumption</strong>Total kWh used by the household per day</p>
+                    </div>
+                    <div class="var-item">
+                        <div class="var-ltr">P</div>
+                        <p><strong>Panel Output</strong>Rated wattage of one solar panel, in kW</p>
+                    </div>
+                    <div class="var-item">
+                        <div class="var-ltr">S</div>
+                        <p><strong>Sunlight Hours</strong>Average peak sunlight hours per day</p>
+                    </div>
+                    <div class="var-item">
+                        <div class="var-ltr">N</div>
+                        <p><strong>Panels Required</strong>N = E &divide; (P &times; S), rounded up</p>
+                    </div>
+                </div>
+                <div class="sl-foot">THE CORE FOUR &bull; SOLAR SMART HOME</div>
+            </section>
 
-                <!-- SLIDE 4: How the Idea Flows -->
-                <section class="slide" aria-label="Slide 4 of 10">
-                    <span class="slide-number">04 / 10</span>
-                    <div class="slide-tag">How the Idea Flows</div>
-                    <div class="slide-title">From Input to Impact</div>
-                    <div class="flow-row">
-                        <div class="flow-step">
-                            <div class="f-icon"><i class="fas fa-bolt"></i></div>
-                            <h4>Daily Usage Input</h4>
-                            <p>kWh or appliance list</p>
-                        </div>
-                        <div class="flow-arrow"><i class="fas fa-chevron-right"></i></div>
-                        <div class="flow-step">
-                            <div class="f-icon"><i class="fas fa-calculator"></i></div>
-                            <h4>Algebra Engine</h4>
-                            <p>Solves for panels needed</p>
-                        </div>
-                        <div class="flow-arrow"><i class="fas fa-chevron-right"></i></div>
-                        <div class="flow-step">
-                            <div class="f-icon"><i class="fas fa-indian-rupee-sign"></i></div>
-                            <h4>Cost & Savings</h4>
-                            <p>Electricity cost + annual savings</p>
-                        </div>
-                        <div class="flow-arrow"><i class="fas fa-chevron-right"></i></div>
-                        <div class="flow-step">
-                            <div class="f-icon"><i class="fas fa-leaf"></i></div>
-                            <h4>Environmental Impact</h4>
-                            <p>CO&#8322; reduction estimate</p>
+            <!-- 7 ─ Outputs -->
+            <section class="slide" style="padding:44px 50px;" aria-label="Slide 7">
+                <span class="sl-num">07 / 10</span>
+                <div class="sl-tag anim">System Outputs</div>
+                <div class="sl-title anim d1">What The System Calculates</div>
+                <div class="g2x2 anim d2">
+                    <div class="out-card">
+                        <div class="out-icon"><i class="fas fa-solar-panel"></i></div>
+                        <div>
+                            <h4>Panels Required</h4>
+                            <p>The exact number of solar panels needed to meet the household's daily energy demand.</p>
                         </div>
                     </div>
-                    <div class="slide-footer">THE CORE FOUR &bull; SOLAR SMART HOME</div>
-                </section>
+                    <div class="out-card">
+                        <div class="out-icon"><i class="fas fa-receipt"></i></div>
+                        <div>
+                            <h4>Estimated Electricity Cost</h4>
+                            <p>Projects current electricity spend based on entered consumption and local tariff rates.</p>
+                        </div>
+                    </div>
+                    <div class="out-card">
+                        <div class="out-icon"><i class="fas fa-hand-holding-dollar"></i></div>
+                        <div>
+                            <h4>Annual Savings</h4>
+                            <p>Calculates how much the household saves each year after switching to solar power.</p>
+                        </div>
+                    </div>
+                    <div class="out-card">
+                        <div class="out-icon"><i class="fas fa-seedling"></i></div>
+                        <div>
+                            <h4>Environmental Benefit</h4>
+                            <p>Estimates the reduction in CO&#8322; emissions from replacing grid power with solar.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="sl-foot">THE CORE FOUR &bull; SOLAR SMART HOME</div>
+            </section>
 
-                <!-- SLIDE 5: How It Works -->
-                <section class="slide" aria-label="Slide 5 of 10">
-                    <span class="slide-number">05 / 10</span>
-                    <div class="slide-tag">How It Works</div>
-                    <div class="slide-title">From Daily Usage to Real Savings</div>
-                    <div class="steps-grid">
-                        <div class="step-card">
-                            <div class="step-num">1</div>
-                            <div class="s-icon"><i class="fas fa-keyboard"></i></div>
-                            <h4>Enter Your Usage</h4>
-                            <p>The user inputs daily electricity consumption (in kWh) or a list of appliances and their usage hours.</p>
-                        </div>
-                        <div class="step-card">
-                            <div class="step-num">2</div>
-                            <div class="s-icon"><i class="fas fa-square-root-variable"></i></div>
-                            <h4>Algebra Calculates Panels</h4>
-                            <p>An algebraic formula divides total energy need by each panel's output to find the exact number of panels required.</p>
-                        </div>
-                        <div class="step-card">
-                            <div class="step-num">3</div>
-                            <div class="s-icon"><i class="fas fa-piggy-bank"></i></div>
-                            <h4>Cost & Savings Revealed</h4>
-                            <p>The system estimates the current electricity cost and projects the annual savings after switching to solar.</p>
-                        </div>
-                        <div class="step-card">
-                            <div class="step-num">4</div>
-                            <div class="s-icon"><i class="fas fa-earth-americas"></i></div>
-                            <h4>Environmental Impact Shown</h4>
-                            <p>Finally, it calculates the reduction in CO&#8322; emissions — showing the real-world eco benefit of the switch.</p>
-                        </div>
+            <!-- 8 ─ Cross-curricular -->
+            <section class="slide" style="padding:44px 50px;" aria-label="Slide 8">
+                <span class="sl-num">08 / 10</span>
+                <div class="sl-tag anim">Cross-Curricular Connection</div>
+                <div class="sl-title anim d1">One Project, Four Subjects</div>
+                <div class="sl-sub anim d2" style="margin-bottom:0;">Solar Smart Home shows how algebra solves real-world energy challenges — connecting Mathematics with Science, Technology, and Sustainability.</div>
+                <div class="g4 anim d3" style="margin-top:16px;">
+                    <div class="card subj-card">
+                        <div class="sic"><i class="fas fa-square-root-variable"></i></div>
+                        <h4>Mathematics</h4>
+                        <p>Algebraic formulas calculate panels, cost, and savings from raw usage data.</p>
                     </div>
-                    <div class="slide-footer">THE CORE FOUR &bull; SOLAR SMART HOME</div>
-                </section>
+                    <div class="card subj-card">
+                        <div class="sic"><i class="fas fa-flask"></i></div>
+                        <h4>Science</h4>
+                        <p>Applies solar energy, power output, and energy conversion to household needs.</p>
+                    </div>
+                    <div class="card subj-card">
+                        <div class="sic"><i class="fas fa-microchip"></i></div>
+                        <h4>Technology</h4>
+                        <p>Turns the math into an interactive tool that instantly computes results.</p>
+                    </div>
+                    <div class="card subj-card">
+                        <div class="sic"><i class="fas fa-recycle"></i></div>
+                        <h4>Sustainability</h4>
+                        <p>Highlights how smarter solar decisions reduce carbon footprint.</p>
+                    </div>
+                </div>
+                <div class="sl-foot">THE CORE FOUR &bull; SOLAR SMART HOME</div>
+            </section>
 
-                <!-- SLIDE 6: The Math Behind It -->
-                <section class="slide" aria-label="Slide 6 of 10">
-                    <span class="slide-number">06 / 10</span>
-                    <div class="slide-tag">The Math Behind It</div>
-                    <div class="slide-title">The Algebra That Powers the System</div>
-                    <div class="formula-box">
-                        <div class="formula-main">
-                            N =
-                            <span class="frac">
-                                <span class="num">E (Daily Energy in kWh)</span>
-                                <span class="den">P (Panel Output in kW) &times; S (Sunlight Hours)</span>
-                            </span>
-                        </div>
-                        <div class="formula-note">Rounded up to the next whole panel</div>
+            <!-- 9 ─ Team -->
+            <section class="slide" style="padding:44px 50px;" aria-label="Slide 9">
+                <span class="sl-num">09 / 10</span>
+                <div class="sl-tag anim">Our Team</div>
+                <div class="sl-title anim d1">Meet The Core Four</div>
+                <div class="g4 anim d2">
+                    <div class="team-card lead">
+                        <div class="avatar">AB</div>
+                        <h4>Aashman Bhardwaj</h4>
+                        <div class="role">Team Leader</div>
                     </div>
-                    <div class="var-grid">
-                        <div class="var-item">
-                            <div class="var-letter">E</div>
-                            <p><strong>Daily Energy Consumption</strong>Total kWh used by the household per day</p>
-                        </div>
-                        <div class="var-item">
-                            <div class="var-letter">P</div>
-                            <p><strong>Panel Output</strong>Rated wattage of one solar panel, in kW</p>
-                        </div>
-                        <div class="var-item">
-                            <div class="var-letter">S</div>
-                            <p><strong>Sunlight Hours</strong>Average peak sunlight hours available per day</p>
-                        </div>
-                        <div class="var-item">
-                            <div class="var-letter">N</div>
-                            <p><strong>Panels Required</strong>N = E &divide; (P &times; S), rounded up</p>
-                        </div>
+                    <div class="team-card">
+                        <div class="avatar">PB</div>
+                        <h4>Prayag Bachani</h4>
+                        <div class="role">Team Member</div>
                     </div>
-                    <div class="slide-footer">THE CORE FOUR &bull; SOLAR SMART HOME</div>
-                </section>
+                    <div class="team-card">
+                        <div class="avatar">MP</div>
+                        <h4>Maanya Singh Parihar</h4>
+                        <div class="role">Team Member</div>
+                    </div>
+                    <div class="team-card">
+                        <div class="avatar">ES</div>
+                        <h4>Erra Sen</h4>
+                        <div class="role">Team Member</div>
+                    </div>
+                </div>
+                <div class="anim d3" style="text-align:center; margin-top:20px; font-size:9px; color:rgba(255,255,255,0.15); letter-spacing:2px; font-family:'Orbitron',sans-serif;">
+                    GRADE VII &bull; MATHEMATICS PROJECT-BASED LEARNING
+                </div>
+                <div class="sl-foot">THE CORE FOUR &bull; SOLAR SMART HOME</div>
+            </section>
 
-                <!-- SLIDE 7: System Outputs -->
-                <section class="slide" aria-label="Slide 7 of 10">
-                    <span class="slide-number">07 / 10</span>
-                    <div class="slide-tag">System Outputs</div>
-                    <div class="slide-title">What The System Calculates</div>
-                    <div class="output-grid">
-                        <div class="output-card">
-                            <div class="o-icon"><i class="fas fa-solar-panel"></i></div>
-                            <div>
-                                <h4>Panels Required</h4>
-                                <p>The exact number of solar panels needed to meet the household's daily energy demand.</p>
-                            </div>
-                        </div>
-                        <div class="output-card">
-                            <div class="o-icon"><i class="fas fa-receipt"></i></div>
-                            <div>
-                                <h4>Estimated Electricity Cost</h4>
-                                <p>Projects current electricity spend based on entered consumption and local tariff rates.</p>
-                            </div>
-                        </div>
-                        <div class="output-card">
-                            <div class="o-icon"><i class="fas fa-hand-holding-dollar"></i></div>
-                            <div>
-                                <h4>Annual Savings</h4>
-                                <p>Calculates how much the household saves each year after switching to solar power.</p>
-                            </div>
-                        </div>
-                        <div class="output-card">
-                            <div class="o-icon"><i class="fas fa-seedling"></i></div>
-                            <div>
-                                <h4>Environmental Benefit</h4>
-                                <p>Estimates the reduction in CO&#8322; emissions from replacing grid power with solar energy.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="slide-footer">THE CORE FOUR &bull; SOLAR SMART HOME</div>
-                </section>
+            <!-- 10 ─ Thank You -->
+            <section class="slide sl-thanks" aria-label="Slide 10">
+                <span class="sl-num">10 / 10</span>
+                <div class="thanks-quote anim">
+                    <strong>Smarter Math. Smarter Homes. Cleaner Planet.</strong><br><br>
+                    Solar Smart Home proves that algebra isn't just a subject in a textbook — it's a real tool that helps families cut costs, save energy, and protect the environment.
+                </div>
+                <div class="thanks-big anim d2">THANK YOU</div>
+                <div class="thanks-credits anim d3">THE CORE FOUR &mdash; Aashman Bhardwaj &bull; Prayag Bachani &bull; Maanya Singh Parihar &bull; Erra Sen</div>
+                <div class="sl-foot" style="left:50%;right:auto;transform:translateX(-50%);">THE CORE FOUR &bull; SOLAR SMART HOME</div>
+            </section>
 
-                <!-- SLIDE 8: Cross-Curricular -->
-                <section class="slide" aria-label="Slide 8 of 10">
-                    <span class="slide-number">08 / 10</span>
-                    <div class="slide-tag">Cross-Curricular Connection</div>
-                    <div class="slide-title">One Project, Four Subjects</div>
-                    <div class="slide-subtitle" style="margin-bottom:0;">
-                        Solar Smart Home shows how algebra can solve real-world energy challenges — connecting Mathematics with Science, Technology, and Sustainability.
-                    </div>
-                    <div class="subject-grid">
-                        <div class="subject-card">
-                            <div class="s-icon"><i class="fas fa-square-root-variable"></i></div>
-                            <h4>Mathematics</h4>
-                            <p>Algebraic formulas calculate the exact number of panels, cost, and savings from raw usage data.</p>
-                        </div>
-                        <div class="subject-card">
-                            <div class="s-icon"><i class="fas fa-flask"></i></div>
-                            <h4>Science</h4>
-                            <p>Applies concepts of solar energy, power output, and energy conversion to real household needs.</p>
-                        </div>
-                        <div class="subject-card">
-                            <div class="s-icon"><i class="fas fa-microchip"></i></div>
-                            <h4>Technology</h4>
-                            <p>Turns the math into an interactive digital tool that instantly computes results for any input.</p>
-                        </div>
-                        <div class="subject-card">
-                            <div class="s-icon"><i class="fas fa-recycle"></i></div>
-                            <h4>Sustainability</h4>
-                            <p>Highlights how smarter solar decisions reduce carbon footprint and support clean energy adoption.</p>
-                        </div>
-                    </div>
-                    <div class="slide-footer">THE CORE FOUR &bull; SOLAR SMART HOME</div>
-                </section>
-
-                <!-- SLIDE 9: Our Team -->
-                <section class="slide" aria-label="Slide 9 of 10">
-                    <span class="slide-number">09 / 10</span>
-                    <div class="slide-tag">Our Team</div>
-                    <div class="slide-title">Meet The Core Four</div>
-                    <div class="team-grid">
-                        <div class="team-card leader-card">
-                            <div class="team-avatar">AB</div>
-                            <h4>Aashman Bhardwaj</h4>
-                            <div class="role">Team Leader</div>
-                        </div>
-                        <div class="team-card">
-                            <div class="team-avatar">PB</div>
-                            <h4>Prayag Bachani</h4>
-                            <div class="role">Team Member</div>
-                        </div>
-                        <div class="team-card">
-                            <div class="team-avatar">MP</div>
-                            <h4>Maanya Singh Parihar</h4>
-                            <div class="role">Team Member</div>
-                        </div>
-                        <div class="team-card">
-                            <div class="team-avatar">ES</div>
-                            <h4>Erra Sen</h4>
-                            <div class="role">Team Member</div>
-                        </div>
-                    </div>
-                    <div style="text-align:center; margin-top:24px; font-size:11px; color:rgba(255,255,255,0.2); letter-spacing:2px; font-family:'Orbitron',sans-serif;">
-                        GRADE VII &bull; MATHEMATICS PROJECT-BASED LEARNING
-                    </div>
-                    <div class="slide-footer">THE CORE FOUR &bull; SOLAR SMART HOME</div>
-                </section>
-
-                <!-- SLIDE 10: Thank You -->
-                <section class="slide thankyou-slide" aria-label="Slide 10 of 10">
-                    <span class="slide-number">10 / 10</span>
-                    <div class="quote">
-                        <strong>Smarter Math. Smarter Homes. Cleaner Planet.</strong><br><br>
-                        Solar Smart Home proves that algebra isn't just a subject in a textbook — it's a real tool that helps families cut costs, save energy, and protect the environment.
-                    </div>
-                    <div class="thanks-label">THANK YOU</div>
-                    <div class="credits">THE CORE FOUR &mdash; Aashman Bhardwaj &bull; Prayag Bachani &bull; Maanya Singh Parihar &bull; Erra Sen</div>
-                    <div class="slide-footer" style="left:50%; right:auto; transform:translateX(-50%);">THE CORE FOUR &bull; SOLAR SMART HOME</div>
-                </section>
-
-            </div>
         </div>
     </div>
+</div>
 
-    <!-- ── Keyboard Hint ── -->
-    <div class="key-hint" aria-hidden="true">
-        <kbd>&larr;</kbd> <kbd>&rarr;</kbd> Navigate &nbsp; <kbd>+</kbd> <kbd>−</kbd> Zoom
+<!-- Hints -->
+<div class="hints" aria-hidden="true">
+    <kbd>&larr;</kbd><kbd>&rarr;</kbd> navigate &nbsp; <kbd>+</kbd><kbd>&minus;</kbd> zoom &nbsp; <kbd>Ctrl</kbd>+<kbd>Scroll</kbd> zoom &nbsp; <kbd>F</kbd> present &nbsp; drag to pan
+</div>
+
+<!-- ── Bottom bar ── -->
+<nav class="bottombar" role="navigation" aria-label="Slide navigation">
+    <button class="nav-btn" id="prevBtn" aria-label="Previous slide">
+        <i class="fas fa-chevron-left"></i> <span class="btn-text">Prev</span>
+    </button>
+    <div class="center-nav">
+        <div class="dots" id="dots" role="tablist" aria-label="Slide selector"></div>
+        <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+        <div class="prog-label" id="progLabel">1 / 10</div>
     </div>
+    <button class="nav-btn" id="nextBtn" aria-label="Next slide">
+        <span class="btn-text">Next</span> <i class="fas fa-chevron-right"></i>
+    </button>
+</nav>
 
-    <!-- ── Bottom Bar ── -->
-    <nav class="bottom-bar" role="navigation" aria-label="Slide navigation">
-        <button class="nav-btn" id="prevBtn" aria-label="Previous slide">
-            <i class="fas fa-chevron-left"></i> Prev
-        </button>
-        <div class="progress-wrap">
-            <div class="slide-dots" id="slideDots" role="tablist" aria-label="Slide selector"></div>
-            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-            <div class="progress-text" id="progressText">1 / 10</div>
-        </div>
-        <button class="nav-btn" id="nextBtn" aria-label="Next slide">
-            Next <i class="fas fa-chevron-right"></i>
-        </button>
-    </nav>
+<script>
+// ── Constants & State ──
+const TOTAL = 10;
+const SLIDE_W = 960;
+const SLIDE_H = 540;
+const ZOOM_MIN = 0.3;
+const ZOOM_MAX = 3.0;
+const ZOOM_STEP = 0.15;
 
-    <script>
-        // ── State ──
-        const TOTAL_SLIDES = 10;
-        let currentSlide = 0;
-        let zoomLevel = 1;
-        const ZOOM_MIN = 0.4;
-        const ZOOM_MAX = 2.0;
-        const ZOOM_STEP = 0.1;
+let cur = 0;
+let zoom = 1;
+let panX = 0, panY = 0;
+let isDragging = false, dragStartX = 0, dragStartY = 0, panStartX = 0, panStartY = 0;
 
-        // ── DOM Refs ──
-        const slideTrack = document.getElementById('slideTrack');
-        const slideScaler = document.getElementById('slideScaler');
-        const slideViewport = document.getElementById('slideViewport');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const progressFill = document.getElementById('progressFill');
-        const progressText = document.getElementById('progressText');
-        const slideDots = document.getElementById('slideDots');
-        const zoomLabel = document.getElementById('zoomLabel');
-        const zoomInBtn = document.getElementById('zoomIn');
-        const zoomOutBtn = document.getElementById('zoomOut');
-        const zoomResetBtn = document.getElementById('zoomReset');
-        const b64display = document.getElementById('b64display');
+// ── DOM ──
+const track = document.getElementById('track');
+const pzWrap = document.getElementById('pzWrap');
+const viewport = document.getElementById('viewport');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const progFill = document.getElementById('progFill');
+const progLabel = document.getElementById('progLabel');
+const dotsEl = document.getElementById('dots');
+const minimapEl = document.getElementById('minimap');
+const zLabel = document.getElementById('zLabel');
+const b64chip = document.getElementById('b64chip');
+const fsBtn = document.getElementById('fsBtn');
 
-        // ── Base64 Zoom State ──
-        // Encodes { slide index, zoom level } as Base64 in the URL hash
-        function encodeState(slide, zoom) {
-            const state = JSON.stringify({ s: slide, z: Math.round(zoom * 100) / 100 });
-            const encoded = btoa(state);
-            window.history.replaceState(null, '', '#' + encoded);
-            b64display.textContent = encoded;
+// ── Base64 State ──
+function encodeState() {
+    const obj = JSON.stringify({ s: cur, z: Math.round(zoom * 100) / 100, px: Math.round(panX), py: Math.round(panY) });
+    const b64 = btoa(obj);
+    history.replaceState(null, '', '#' + b64);
+    b64chip.textContent = b64;
+}
+
+function decodeState() {
+    const h = location.hash.slice(1);
+    if (!h) return null;
+    try {
+        const o = JSON.parse(atob(h));
+        if (typeof o.s === 'number') return o;
+    } catch (e) {}
+    return null;
+}
+
+// ── Copy Base64 ──
+b64chip.addEventListener('click', () => {
+    navigator.clipboard.writeText(b64chip.textContent).then(() => {
+        b64chip.style.color = 'var(--accent)';
+        setTimeout(() => b64chip.style.color = '', 800);
+    });
+});
+
+// ── Auto-fit calculation ──
+function calcFitScale() {
+    const vw = viewport.clientWidth;
+    const vh = viewport.clientHeight;
+    const padX = 60, padY = 40;
+    const sx = (vw - padX) / SLIDE_W;
+    const sy = (vh - padY) / SLIDE_H;
+    return Math.min(sx, sy, 1.5);
+}
+
+function applyTransform(smooth) {
+    if (smooth !== false) {
+        pzWrap.classList.remove('no-transition');
+    } else {
+        pzWrap.classList.add('no-transition');
+    }
+
+    const fitScale = calcFitScale();
+    const effectiveZoom = fitScale * zoom;
+    const vw = viewport.clientWidth;
+    const vh = viewport.clientHeight;
+
+    // Center the current slide, then apply pan offset
+    const baseX = (vw - SLIDE_W * effectiveZoom) / 2 - cur * SLIDE_W * effectiveZoom;
+    const baseY = (vh - SLIDE_H * effectiveZoom) / 2;
+
+    pzWrap.style.transform = `translate(${baseX + panX}px, ${baseY + panY}px) scale(${effectiveZoom})`;
+
+    if (smooth === false) {
+        // Force reflow then re-enable transitions
+        pzWrap.offsetHeight;
+        pzWrap.classList.remove('no-transition');
+    }
+}
+
+// ── Navigation ──
+function goTo(idx, smooth) {
+    cur = Math.max(0, Math.min(TOTAL - 1, idx));
+    // Reset pan when navigating
+    panX = 0; panY = 0;
+
+    // Update active slide class for animations
+    document.querySelectorAll('.slide').forEach((sl, i) => {
+        sl.classList.toggle('active', i === cur);
+    });
+
+    updateUI();
+    applyTransform(smooth);
+    encodeState();
+}
+
+function updateUI() {
+    const pct = ((cur + 1) / TOTAL) * 100;
+    progFill.style.width = pct + '%';
+    progLabel.textContent = `${cur + 1} / ${TOTAL}`;
+    prevBtn.disabled = cur === 0;
+    nextBtn.disabled = cur === TOTAL - 1;
+
+    document.querySelectorAll('.dot').forEach((d, i) => {
+        d.classList.toggle('on', i === cur);
+        d.setAttribute('aria-selected', i === cur);
+    });
+    document.querySelectorAll('.mm-slide').forEach((m, i) => {
+        m.classList.toggle('on', i === cur);
+    });
+}
+
+// ── Zoom ──
+function setZoom(z, smooth) {
+    zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Math.round(z * 100) / 100));
+    zLabel.textContent = Math.round(zoom * 100) + '%';
+    applyTransform(smooth);
+    encodeState();
+}
+
+// ── Build dots ──
+for (let i = 0; i < TOTAL; i++) {
+    const d = document.createElement('button');
+    d.className = 'dot';
+    d.setAttribute('role', 'tab');
+    d.setAttribute('aria-label', `Slide ${i + 1}`);
+    d.addEventListener('click', () => goTo(i));
+    dotsEl.appendChild(d);
+}
+
+// ── Build minimap ──
+for (let i = 0; i < TOTAL; i++) {
+    const m = document.createElement('div');
+    m.className = 'mm-slide' + (i === 0 ? ' on' : '');
+    m.setAttribute('data-n', String(i + 1).padStart(2, '0'));
+    m.setAttribute('role', 'button');
+    m.setAttribute('aria-label', `Jump to slide ${i + 1}`);
+    m.tabIndex = 0;
+    m.addEventListener('click', () => goTo(i));
+    m.addEventListener('keydown', (e) => { if (e.key === 'Enter') goTo(i); });
+    minimapEl.appendChild(m);
+}
+
+// ── Sun icon rays ──
+const sunIcon = document.querySelector('.sun-icon');
+if (sunIcon) {
+    for (let i = 0; i < 8; i++) {
+        const r = document.createElement('div');
+        r.className = 'ray';
+        r.style.transform = `translate(-50%, -100%) rotate(${i * 45}deg)`;
+        sunIcon.appendChild(r);
+    }
+}
+
+// ── Events ──
+prevBtn.addEventListener('click', () => goTo(cur - 1));
+nextBtn.addEventListener('click', () => goTo(cur + 1));
+document.getElementById('zIn').addEventListener('click', () => setZoom(zoom + ZOOM_STEP));
+document.getElementById('zOut').addEventListener('click', () => setZoom(zoom - ZOOM_STEP));
+document.getElementById('zReset').addEventListener('click', () => { zoom = 1; panX = 0; panY = 0; setZoom(1); });
+
+// Fullscreen
+fsBtn.addEventListener('click', () => {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+        document.body.classList.add('fs-mode');
+    } else {
+        document.exitFullscreen();
+        document.body.classList.remove('fs-mode');
+    }
+});
+document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement) document.body.classList.remove('fs-mode');
+    // Re-fit after a tick
+    setTimeout(() => applyTransform(), 100);
+});
+
+// Keyboard
+document.addEventListener('keydown', (e) => {
+    // Don't hijack if user is in an input
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    switch (e.key) {
+        case 'ArrowLeft': case 'ArrowUp': e.preventDefault(); goTo(cur - 1); break;
+        case 'ArrowRight': case 'ArrowDown': case ' ': e.preventDefault(); goTo(cur + 1); break;
+        case '+': case '=': e.preventDefault(); setZoom(zoom + ZOOM_STEP); break;
+        case '-': case '_': e.preventDefault(); setZoom(zoom - ZOOM_STEP); break;
+        case '0': e.preventDefault(); zoom = 1; panX = 0; panY = 0; setZoom(1); break;
+        case 'f': case 'F': fsBtn.click(); break;
+        case 'Home': e.preventDefault(); goTo(0); break;
+        case 'End': e.preventDefault(); goTo(TOTAL - 1); break;
+    }
+});
+
+// Ctrl+Scroll zoom
+viewport.addEventListener('wheel', (e) => {
+    if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        const d = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
+        setZoom(zoom + d);
+    }
+}, { passive: false });
+
+// Mouse drag to pan
+viewport.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return;
+    isDragging = true;
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+    panStartX = panX;
+    panStartY = panY;
+    viewport.classList.add('dragging');
+    pzWrap.classList.add('no-transition');
+});
+
+window.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    panX = panStartX + (e.clientX - dragStartX);
+    panY = panStartY + (e.clientY - dragStartY);
+    applyTransform(false);
+});
+
+window.addEventListener('mouseup', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    viewport.classList.remove('dragging');
+    pzWrap.classList.remove('no-transition');
+    encodeState();
+});
+
+// Touch: swipe to navigate, pinch to zoom
+let touchStartX = 0, touchStartY = 0, touchDist = 0, touchZoomStart = 1;
+viewport.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 1) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+    } else if (e.touches.length === 2) {
+        touchDist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+        );
+        touchZoomStart = zoom;
+        pzWrap.classList.add('no-transition');
+    }
+}, { passive: true });
+
+viewport.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2) {
+        const dist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+        );
+        const ratio = dist / Math.max(1, touchDist);
+        setZoom(touchZoomStart * ratio, false);
+    }
+}, { passive: true });
+
+viewport.addEventListener('touchend', (e) => {
+    pzWrap.classList.remove('no-transition');
+    if (e.changedTouches.length === 1 && touchDist === 0) {
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        const dy = e.changedTouches[0].clientY - touchStartY;
+        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+            goTo(dx < 0 ? cur + 1 : cur - 1);
         }
+    }
+    touchDist = 0;
+}, { passive: true });
 
-        function decodeState() {
-            const hash = window.location.hash.slice(1);
-            if (hash) {
-                try {
-                    const json = atob(hash);
-                    const state = JSON.parse(json);
-                    if (typeof state.s === 'number' && typeof state.z === 'number') {
-                        return {
-                            slide: Math.max(0, Math.min(TOTAL_SLIDES - 1, Math.round(state.s))),
-                            zoom: Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, state.z))
-                        };
-                    }
-                } catch (e) {
-                    // Invalid base64 — ignore
-                }
-            }
-            return null;
-        }
+// Resize re-fit
+let resizeTimer;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => applyTransform(), 80);
+});
 
-        // ── Navigation ──
-        function goToSlide(index) {
-            currentSlide = Math.max(0, Math.min(TOTAL_SLIDES - 1, index));
-            const slideW = document.querySelector('.slide').offsetWidth;
-            slideTrack.style.transform = `translateX(-${currentSlide * slideW}px)`;
-            updateUI();
-            encodeState(currentSlide, zoomLevel);
-        }
+// ── Starfield ──
+const canvas = document.getElementById('starfield');
+const ctx = canvas.getContext('2d');
+let stars = [];
 
-        function updateUI() {
-            // Progress
-            const pct = ((currentSlide + 1) / TOTAL_SLIDES) * 100;
-            progressFill.style.width = pct + '%';
-            progressText.textContent = `${currentSlide + 1} / ${TOTAL_SLIDES}`;
+function resizeCanvas() { canvas.width = innerWidth; canvas.height = innerHeight; }
 
-            // Buttons
-            prevBtn.disabled = currentSlide === 0;
-            nextBtn.disabled = currentSlide === TOTAL_SLIDES - 1;
-
-            // Dots
-            document.querySelectorAll('.slide-dot').forEach((dot, i) => {
-                dot.classList.toggle('active', i === currentSlide);
-                dot.setAttribute('aria-selected', i === currentSlide);
-            });
-        }
-
-        // ── Zoom ──
-        function setZoom(level) {
-            zoomLevel = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Math.round(level * 100) / 100));
-            slideScaler.style.transform = `scale(${zoomLevel})`;
-            zoomLabel.textContent = Math.round(zoomLevel * 100) + '%';
-            encodeState(currentSlide, zoomLevel);
-        }
-
-        // ── Create Dots ──
-        for (let i = 0; i < TOTAL_SLIDES; i++) {
-            const dot = document.createElement('button');
-            dot.classList.add('slide-dot');
-            dot.setAttribute('role', 'tab');
-            dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
-            dot.addEventListener('click', () => goToSlide(i));
-            slideDots.appendChild(dot);
-        }
-
-        // ── Event Listeners ──
-        prevBtn.addEventListener('click', () => goToSlide(currentSlide - 1));
-        nextBtn.addEventListener('click', () => goToSlide(currentSlide + 1));
-        zoomInBtn.addEventListener('click', () => setZoom(zoomLevel + ZOOM_STEP));
-        zoomOutBtn.addEventListener('click', () => setZoom(zoomLevel - ZOOM_STEP));
-        zoomResetBtn.addEventListener('click', () => setZoom(1));
-
-        // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-                e.preventDefault();
-                goToSlide(currentSlide - 1);
-            } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
-                e.preventDefault();
-                goToSlide(currentSlide + 1);
-            } else if (e.key === '+' || e.key === '=') {
-                e.preventDefault();
-                setZoom(zoomLevel + ZOOM_STEP);
-            } else if (e.key === '-' || e.key === '_') {
-                e.preventDefault();
-                setZoom(zoomLevel - ZOOM_STEP);
-            } else if (e.key === '0') {
-                e.preventDefault();
-                setZoom(1);
-            }
+function makeStars() {
+    stars = [];
+    for (let i = 0; i < 180; i++) {
+        stars.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            r: Math.random() * 1.1 + 0.2,
+            a: Math.random() * 0.6 + 0.15,
+            sp: Math.random() * 0.012 + 0.003,
+            ph: Math.random() * Math.PI * 2
         });
+    }
+}
 
-        // Mouse wheel zoom (Ctrl + scroll)
-        slideViewport.addEventListener('wheel', (e) => {
-            if (e.ctrlKey || e.metaKey) {
-                e.preventDefault();
-                const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
-                setZoom(zoomLevel + delta);
-            }
-        }, { passive: false });
+function drawStars(t) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const s of stars) {
+        const f = Math.sin(t * s.sp + s.ph);
+        const a = s.a * (0.6 + 0.4 * f);
+        const r = Math.max(0.1, s.r * (0.85 + 0.15 * f));
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${a.toFixed(3)})`;
+        ctx.fill();
+    }
+    requestAnimationFrame(drawStars);
+}
 
-        // Touch swipe
-        let touchStartX = 0;
-        let touchStartY = 0;
-        slideViewport.addEventListener('touchstart', (e) => {
-            touchStartX = e.touches[0].clientX;
-            touchStartY = e.touches[0].clientY;
-        }, { passive: true });
+resizeCanvas(); makeStars(); requestAnimationFrame(drawStars);
+window.addEventListener('resize', () => { resizeCanvas(); makeStars(); });
 
-        slideViewport.addEventListener('touchend', (e) => {
-            const dx = e.changedTouches[0].clientX - touchStartX;
-            const dy = e.changedTouches[0].clientY - touchStartY;
-            if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
-                if (dx < 0) goToSlide(currentSlide + 1);
-                else goToSlide(currentSlide - 1);
-            }
-        }, { passive: true });
+// ── Init from Base64 or default ──
+const saved = decodeState();
+if (saved) {
+    cur = Math.max(0, Math.min(TOTAL - 1, Math.round(saved.s)));
+    zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, saved.z || 1));
+    if (saved.px !== undefined) panX = saved.px;
+    if (saved.py !== undefined) panY = saved.py;
+    zLabel.textContent = Math.round(zoom * 100) + '%';
+}
 
-        // ── Solar icon rays on title slide ──
-        const solarBig = document.querySelector('.solar-big');
-        if (solarBig) {
-            for (let i = 0; i < 8; i++) {
-                const ray = document.createElement('div');
-                ray.classList.add('ray');
-                ray.style.transform = `translate(-50%, -100%) rotate(${i * 45}deg)`;
-                solarBig.appendChild(ray);
-            }
-        }
-
-        // ── Starfield ──
-        const canvas = document.getElementById('starfield');
-        const ctx = canvas.getContext('2d');
-        let stars = [];
-        const STAR_COUNT = 200;
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-
-        function createStars() {
-            stars = [];
-            for (let i = 0; i < STAR_COUNT; i++) {
-                stars.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    radius: Math.random() * 1.2 + 0.2,
-                    alpha: Math.random() * 0.7 + 0.2,
-                    speed: Math.random() * 0.015 + 0.004,
-                    phase: Math.random() * Math.PI * 2
-                });
-            }
-        }
-
-        function drawStars(time) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (const s of stars) {
-                const f = Math.sin(time * s.speed + s.phase);
-                const a = s.alpha * (0.6 + 0.4 * f);
-                const r = Math.max(0.1, s.radius * (0.85 + 0.15 * f));
-                ctx.beginPath();
-                ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255,255,255,${a.toFixed(3)})`;
-                ctx.fill();
-            }
-            requestAnimationFrame(drawStars);
-        }
-
-        resizeCanvas();
-        createStars();
-        requestAnimationFrame(drawStars);
-        window.addEventListener('resize', () => {
-            resizeCanvas();
-            createStars();
-        });
-
-        // ── Initialize from Base64 state or defaults ──
-        const savedState = decodeState();
-        if (savedState) {
-            zoomLevel = savedState.zoom;
-            currentSlide = savedState.slide;
-            slideScaler.style.transform = `scale(${zoomLevel})`;
-            zoomLabel.textContent = Math.round(zoomLevel * 100) + '%';
-        }
-
-        // Ensure slides are rendered before navigating
-        requestAnimationFrame(() => {
-            goToSlide(currentSlide);
-        });
-    </script>
+// First render without transition, then enable
+requestAnimationFrame(() => {
+    applyTransform(false);
+    // Mark first slide active
+    document.querySelectorAll('.slide').forEach((sl, i) => sl.classList.toggle('active', i === cur));
+    updateUI();
+    encodeState();
+});
+</script>
 </body>
 </html>
