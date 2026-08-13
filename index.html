@@ -6,7 +6,11 @@
     <title>Solar Smart Home</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             min-height: 100vh;
@@ -19,13 +23,17 @@
             position: relative;
         }
 
+        /* Starfield canvas */
         #starfield {
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             z-index: 0;
         }
 
+        /* Nebula glow blobs */
         .nebula {
             position: fixed;
             border-radius: 50%;
@@ -36,22 +44,29 @@
         }
 
         .nebula-1 {
-            width: 500px; height: 500px;
+            width: 500px;
+            height: 500px;
             background: radial-gradient(circle, #ff6a0033, transparent 70%);
-            top: -10%; right: -5%;
+            top: -10%;
+            right: -5%;
+            animation-delay: 0s;
         }
 
         .nebula-2 {
-            width: 600px; height: 600px;
+            width: 600px;
+            height: 600px;
             background: radial-gradient(circle, #1a3a5c, transparent 70%);
-            bottom: -15%; left: -10%;
+            bottom: -15%;
+            left: -10%;
             animation-delay: 3s;
         }
 
         .nebula-3 {
-            width: 350px; height: 350px;
+            width: 350px;
+            height: 350px;
             background: radial-gradient(circle, #ffc10722, transparent 70%);
-            top: 50%; left: 60%;
+            top: 50%;
+            left: 60%;
             animation-delay: 5s;
         }
 
@@ -60,6 +75,7 @@
             100% { transform: scale(1.2); opacity: 0.4; }
         }
 
+        /* Main content container */
         .container {
             position: relative;
             z-index: 10;
@@ -70,7 +86,7 @@
             border: 1px solid rgba(255, 255, 255, 0.06);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            max-width: 720px;
+            max-width: 680px;
             width: 90%;
             animation: containerIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             opacity: 0;
@@ -78,11 +94,16 @@
         }
 
         @keyframes containerIn {
-            to { opacity: 1; transform: translateY(0) scale(1); }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
+        /* Solar icon */
         .solar-icon {
-            width: 64px; height: 64px;
+            width: 64px;
+            height: 64px;
             margin: 0 auto 28px;
             position: relative;
             animation: iconSpin 20s linear infinite, iconGlow 3s ease-in-out infinite alternate;
@@ -90,8 +111,10 @@
 
         .solar-icon .core {
             position: absolute;
-            top: 50%; left: 50%;
-            width: 18px; height: 18px;
+            top: 50%;
+            left: 50%;
+            width: 18px;
+            height: 18px;
             background: #ffb300;
             border-radius: 50%;
             transform: translate(-50%, -50%);
@@ -100,19 +123,25 @@
 
         .solar-icon .ray {
             position: absolute;
-            top: 50%; left: 50%;
-            width: 2px; height: 28px;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 28px;
             background: linear-gradient(to top, #ffb30088, transparent);
             transform-origin: bottom center;
             border-radius: 2px;
         }
 
-        @keyframes iconSpin { to { transform: rotate(360deg); } }
+        @keyframes iconSpin {
+            to { transform: rotate(360deg); }
+        }
+
         @keyframes iconGlow {
             0% { filter: drop-shadow(0 0 8px rgba(255, 179, 0, 0.3)); }
             100% { filter: drop-shadow(0 0 20px rgba(255, 179, 0, 0.6)); }
         }
 
+        /* Title */
         .title {
             font-family: 'Orbitron', sans-serif;
             font-weight: 900;
@@ -122,7 +151,6 @@
             margin-bottom: 20px;
             line-height: 1.2;
             background: linear-gradient(135deg, #ffffff 0%, #ffb300 50%, #ff8f00 100%);
-            background-size: 200% 200%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -134,6 +162,11 @@
             100% { background-position: 100% 50%; }
         }
 
+        .title {
+            background-size: 200% 200%;
+        }
+
+        /* Subtitle */
         .subtitle {
             font-family: 'Space Grotesk', sans-serif;
             font-weight: 300;
@@ -150,7 +183,10 @@
         }
 
         @keyframes subtitleIn {
-            to { opacity: 1; transform: translateY(0); }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .subtitle .highlight {
@@ -158,9 +194,10 @@
             font-weight: 600;
         }
 
+        /* Buttons wrapper */
         .buttons {
             display: flex;
-            gap: 16px;
+            gap: 20px;
             justify-content: center;
             flex-wrap: wrap;
             animation: buttonsIn 1.2s 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -169,19 +206,23 @@
         }
 
         @keyframes buttonsIn {
-            to { opacity: 1; transform: translateY(0); }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
+        /* Button base */
         .btn {
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            padding: 16px 36px;
+            padding: 16px 40px;
             border-radius: 14px;
             font-family: 'Orbitron', sans-serif;
             font-weight: 700;
-            font-size: 14px;
-            letter-spacing: 1.5px;
+            font-size: 15px;
+            letter-spacing: 2px;
             text-decoration: none;
             text-transform: uppercase;
             position: relative;
@@ -195,14 +236,19 @@
         .btn::before {
             content: '';
             position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
             transition: left 0.6s ease;
         }
 
-        .btn:hover::before { left: 100%; }
+        .btn:hover::before {
+            left: 100%;
+        }
 
+        /* Website button - warm solar glow */
         .btn-website {
             background: linear-gradient(135deg, #ff8f00, #ffb300);
             color: #0a0a0a;
@@ -211,9 +257,18 @@
 
         .btn-website:hover {
             transform: translateY(-3px) scale(1.04);
-            box-shadow: 0 8px 40px rgba(255, 143, 0, 0.4), 0 0 80px rgba(255, 179, 0, 0.15);
+            box-shadow: 0 8px 40px rgba(255, 143, 0, 0.4), 0 0 0 1px rgba(255, 179, 0, 0.4), 0 0 80px rgba(255, 179, 0, 0.15);
         }
 
+        .btn-website:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .btn-website .btn-icon {
+            font-size: 18px;
+        }
+
+        /* Feedback button - cool space outline */
         .btn-feedback {
             background: transparent;
             color: rgba(255, 255, 255, 0.85);
@@ -225,27 +280,23 @@
             transform: translateY(-3px) scale(1.04);
             border-color: rgba(255, 255, 255, 0.35);
             background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 40px rgba(255, 255, 255, 0.06), 0 0 0 1px rgba(255, 255, 255, 0.1);
             color: #fff;
         }
 
-        .btn-ppt {
-            background: linear-gradient(135deg, #1a3a5c, #0d7377);
-            color: #e0f7fa;
-            box-shadow: 0 4px 24px rgba(13, 115, 119, 0.3), 0 0 0 1px rgba(13, 115, 119, 0.3);
+        .btn-feedback:active {
+            transform: translateY(0) scale(0.98);
         }
 
-        .btn-ppt:hover {
-            transform: translateY(-3px) scale(1.04);
-            box-shadow: 0 8px 40px rgba(13, 115, 119, 0.45), 0 0 80px rgba(13, 115, 119, 0.15);
+        .btn-feedback .btn-icon {
+            font-size: 18px;
         }
 
-        .btn:active { transform: translateY(0) scale(0.98) !important; }
-        .btn:focus-visible { outline: 2px solid #ffb300; outline-offset: 4px; }
-        .btn .btn-icon { font-size: 18px; }
-
+        /* Floating particles around container */
         .particle {
             position: fixed;
-            width: 2px; height: 2px;
+            width: 2px;
+            height: 2px;
             background: rgba(255, 179, 0, 0.6);
             border-radius: 50%;
             z-index: 1;
@@ -254,30 +305,45 @@
         }
 
         @keyframes floatParticle {
-            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(-10vh) translateX(40px); opacity: 0; }
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-10vh) translateX(40px);
+                opacity: 0;
+            }
         }
 
+        /* Shooting star */
         .shooting-star {
             position: fixed;
-            width: 80px; height: 1px;
+            width: 80px;
+            height: 1px;
             background: linear-gradient(to right, rgba(255,255,255,0.7), transparent);
             z-index: 1;
             opacity: 0;
             pointer-events: none;
+            animation: shoot 6s ease-in infinite;
         }
 
         .shooting-star:nth-child(1) {
-            top: 15%; left: 20%;
-            animation: shoot 6s 2s ease-in infinite;
+            top: 15%;
+            left: 20%;
+            animation-delay: 2s;
             transform: rotate(-35deg);
         }
 
         .shooting-star:nth-child(2) {
-            top: 40%; left: 70%;
-            animation: shoot 6s 5s ease-in infinite;
+            top: 40%;
+            left: 70%;
+            animation-delay: 5s;
             transform: rotate(-40deg);
         }
 
@@ -288,12 +354,14 @@
             100% { opacity: 0; }
         }
 
+        /* Bottom subtle line */
         .bottom-line {
             position: fixed;
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            width: 60px; height: 2px;
+            width: 60px;
+            height: 2px;
             background: linear-gradient(to right, transparent, rgba(255, 179, 0, 0.3), transparent);
             border-radius: 2px;
             z-index: 10;
@@ -305,6 +373,12 @@
             50% { opacity: 0.7; width: 100px; }
         }
 
+        /* Focus visible for accessibility */
+        .btn:focus-visible {
+            outline: 2px solid #ffb300;
+            outline-offset: 4px;
+        }
+
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
@@ -313,29 +387,45 @@
             }
         }
 
-        @media (max-width: 600px) {
-            .container { padding: 40px 24px; }
-            .btn { padding: 13px 24px; font-size: 12px; letter-spacing: 1px; }
-            .buttons { gap: 12px; }
+        @media (max-width: 500px) {
+            .container {
+                padding: 40px 28px;
+            }
+            .btn {
+                padding: 14px 30px;
+                font-size: 13px;
+            }
+            .buttons {
+                gap: 14px;
+            }
         }
     </style>
 </head>
 <body>
 
+    <!-- Starfield Canvas -->
     <canvas id="starfield" aria-hidden="true"></canvas>
+
+    <!-- Nebula glows -->
     <div class="nebula nebula-1" aria-hidden="true"></div>
     <div class="nebula nebula-2" aria-hidden="true"></div>
     <div class="nebula nebula-3" aria-hidden="true"></div>
+
+    <!-- Shooting stars -->
     <div class="shooting-star" aria-hidden="true"></div>
     <div class="shooting-star" aria-hidden="true"></div>
 
+    <!-- Main Content -->
     <main class="container" role="main">
+        <!-- Solar icon -->
         <div class="solar-icon" aria-hidden="true">
             <div class="core"></div>
         </div>
 
+        <!-- Title -->
         <h1 class="title">Solar Smart Home</h1>
 
+        <!-- Subtitle -->
         <p class="subtitle">
             The Core Four &mdash;
             <span class="highlight">Aashman Bhardwaj</span> (Leader),
@@ -344,27 +434,32 @@
             And Prayag Bachani
         </p>
 
+        <!-- Buttons -->
         <div class="buttons">
             <a href="https://aashman-bhardwaj.github.io/solar-smart-home/index.html"
-               class="btn btn-website" target="_blank" rel="noopener noreferrer"
+               class="btn btn-website"
+               target="_blank"
+               rel="noopener noreferrer"
                aria-label="Visit the Solar Smart Home website">
-                <span class="btn-icon">&#9788;</span> Website
+                <span class="btn-icon">&#9788;</span>
+                Website
             </a>
             <a href="https://aashman-bhardwaj.github.io/customer-form/index.html"
-               class="btn btn-feedback" target="_blank" rel="noopener noreferrer"
+               class="btn btn-feedback"
+               target="_blank"
+               rel="noopener noreferrer"
                aria-label="Go to the feedback form">
-                <span class="btn-icon">&#9993;</span> Feedback
-            </a>
-            <a href="presentation.html" class="btn btn-ppt"
-               aria-label="View the PPT presentation">
-                <span class="btn-icon">&#9654;</span> Presentation
+                <span class="btn-icon">&#9993;</span>
+                Feedback
             </a>
         </div>
     </main>
 
+    <!-- Bottom decorative line -->
     <div class="bottom-line" aria-hidden="true"></div>
 
     <script>
+        // ── Starfield Renderer ──
         const canvas = document.getElementById('starfield');
         const ctx = canvas.getContext('2d');
         let stars = [];
@@ -395,14 +490,17 @@
                 const flicker = Math.sin(time * star.twinkleSpeed + star.twinklePhase);
                 const alpha = star.alpha * (0.6 + 0.4 * flicker);
                 const r = Math.max(0.1, star.radius * (0.85 + 0.15 * flicker));
+
                 ctx.beginPath();
                 ctx.arc(star.x, star.y, r, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255,255,255,${alpha.toFixed(3)})`;
+                ctx.fillStyle = `rgba(255, 255, 255, ${alpha.toFixed(3)})`;
                 ctx.fill();
+
+                // Slight glow on brighter stars
                 if (star.radius > 1.0) {
                     ctx.beginPath();
                     ctx.arc(star.x, star.y, r * 3, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(255,230,180,${(alpha * 0.08).toFixed(4)})`;
+                    ctx.fillStyle = `rgba(255, 230, 180, ${(alpha * 0.08).toFixed(4)})`;
                     ctx.fill();
                 }
             }
@@ -412,33 +510,44 @@
         resizeCanvas();
         createStars();
         requestAnimationFrame(drawStars);
-        window.addEventListener('resize', () => { resizeCanvas(); createStars(); });
 
-        // Solar icon rays
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            createStars();
+        });
+
+        // ── Generate solar icon rays dynamically ──
         const solarIcon = document.querySelector('.solar-icon');
-        for (let i = 0; i < 8; i++) {
+        const rayCount = 8;
+        for (let i = 0; i < rayCount; i++) {
             const ray = document.createElement('div');
             ray.classList.add('ray');
-            ray.style.transform = `translate(-50%, -100%) rotate(${i * 45}deg)`;
+            ray.style.transform = `translate(-50%, -100%) rotate(${i * (360 / rayCount)}deg)`;
             solarIcon.appendChild(ray);
         }
 
-        // Floating particles
+        // ── Floating particles ──
         function spawnParticle() {
             const p = document.createElement('div');
             p.classList.add('particle');
-            p.style.left = Math.random() * window.innerWidth + 'px';
+            const x = Math.random() * window.innerWidth;
+            const duration = Math.random() * 8 + 6;
             const size = Math.random() * 2 + 1;
+            p.style.left = x + 'px';
             p.style.width = size + 'px';
             p.style.height = size + 'px';
-            const dur = Math.random() * 8 + 6;
-            p.style.animationDuration = dur + 's';
+            p.style.animationDuration = duration + 's';
+            p.style.opacity = '0';
             document.body.appendChild(p);
-            setTimeout(() => p.remove(), dur * 1000);
+            setTimeout(() => p.remove(), duration * 1000);
         }
 
+        // Spawn particles at intervals
         setInterval(spawnParticle, 800);
-        for (let i = 0; i < 12; i++) setTimeout(spawnParticle, i * 200);
+        // Initial batch
+        for (let i = 0; i < 12; i++) {
+            setTimeout(spawnParticle, i * 200);
+        }
     </script>
 </body>
 </html>
